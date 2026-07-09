@@ -6,8 +6,6 @@ on:
     branches:
       - nicolai-test-*
 
-env:
-
 jobs:
   build:
     name: Build
