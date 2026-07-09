@@ -18,8 +18,8 @@ jobs:
       run:
         working-directory: .
     steps:
-      - name: Check out code
-        uses: actions/checkout@v6
+      # - name: Check out code
+      #   uses: actions/checkout@v6
 
       - name: Echo current commit SHA
         run: 'echo "Current commit SHA: $GITHUB_SHA"'
