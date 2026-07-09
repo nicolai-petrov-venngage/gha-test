@@ -21,4 +21,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v6
 
+      - name: Echo current commit SHA
+        run: 'echo "Current commit SHA: $GITHUB_SHA"'
+
 
