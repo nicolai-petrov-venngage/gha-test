@@ -1,0 +1,26 @@
+
+name: nicolai-test
+
+on:
+  push:
+    branches:
+      - nicolai-test-*
+
+env:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
+
