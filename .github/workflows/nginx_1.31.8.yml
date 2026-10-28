@@ -1,0 +1,31 @@
+name: mirroring_nginx
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: "# Image from Docker Hub, nginx:1.31.8"
+        required: true
+        default: "nginx:1.31.8"
+
+permissions:
+  packages: write
+
+jobs:
+  mirror:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Copy image and print digest
+        env:
+          IMAGE: ${{ inputs.image }}
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          TARGET="ghcr.io/${OWNER}/${IMAGE}"
+          docker buildx imagetools create -t "${TARGET}" "docker.io/library/${IMAGE}"
+          DIGEST=$(docker buildx imagetools inspect "${TARGET}" --format '{{.Manifest.Digest}}')
+          echo "### ${TARGET}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Digest: \`${DIGEST}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "FROM ${TARGET%:*}@${DIGEST}" >> "$GITHUB_STEP_SUMMARY"
