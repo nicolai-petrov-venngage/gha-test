@@ -1,0 +1,33 @@
+name: mirror-images
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: "Образ с Docker Hub, например nginx:1.27-alpine"
+        required: true
+        default: "nginx:1.27-alpine"
+
+permissions:
+  packages: write
+
+jobs:
+  mirror:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: imjasonh/setup-crane@v0.4
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | crane auth login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Copy image and print digest
+        env:
+          IMAGE: ${{ inputs.image }}
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          TARGET="ghcr.io/${OWNER}/mirror/${IMAGE}"
+          crane copy "docker.io/library/${IMAGE}" "${TARGET}"
+          DIGEST=$(crane digest "${TARGET}")
+          echo "### ${TARGET}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Digest: \`${DIGEST}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "FROM ${TARGET%:*}@${DIGEST}" >> "$GITHUB_STEP_SUMMARY"
