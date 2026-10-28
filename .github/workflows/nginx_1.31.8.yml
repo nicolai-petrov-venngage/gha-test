@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       image:
-        description: "# Image from Docker Hub, nginx:1.31.8"
+        description: "# Image from Docker Hub "
         required: true
         default: "nginx:1.31.8"
 
